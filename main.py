@@ -13,7 +13,7 @@ os.environ['https_proxy'] = proxy_url
 class PersonalDashboard:
 
     def __init__(self):
-        self.stocks = ["AAPL", "NVDA", "0700.HK", "2800.HK"]  # Add your portfolio here
+        self.stocks = ["TSLA", "AAPL", "NVDA", "0700.HK", "2800.HK"]  # Add your portfolio here
         self.news_feeds = {
             "Global Business": "https://search.cnbc.com/rs/search/view.xml?partnerId=2000&keywords=business",
             "HK News (SCMP)": "https://www.scmp.com/rss/2/feed",

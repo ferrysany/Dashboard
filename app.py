@@ -16,3 +16,4 @@ if st.button('🔄 Run My Script Now'):
         st.code(result, language='text')
 else:
     st.write("Click the button above to see your NBA scores, Stocks, and News.")
+
