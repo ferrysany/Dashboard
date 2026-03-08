@@ -9,7 +9,7 @@ if st.button('🔄 Run My Script'):
     result = subprocess.run([sys.executable, 'main.py'], capture_output=True, text=True)
 
     if result.returncode == 0:
-        st.code(result.stdout)
+        st.markdown(result.stdout.replace('\n',' \n'))
     else:
         st.error("❌ Your script crashed. Here is why:")
         st.code(result.stderr)  # This is the "magic" line that shows the bug
