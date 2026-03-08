@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup
 
 proxy_url = "http://127.0.0.1:7897"
 
-os.environ['HTTP_PROXY'] = proxy_url
-os.environ['HTTPS_PROXY'] = proxy_url
-os.environ['http_proxy'] = proxy_url
-os.environ['https_proxy'] = proxy_url
+#os.environ['HTTP_PROXY'] = proxy_url
+#os.environ['HTTPS_PROXY'] = proxy_url
+#os.environ['http_proxy'] = proxy_url
+#os.environ['https_proxy'] = proxy_url
 
 class PersonalDashboard:
 
