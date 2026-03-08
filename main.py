@@ -101,7 +101,10 @@ class PersonalDashboard:
             response = session.get(url)
             feed = feedparser.parse(response.content)
             for entry in feed.entries[:3]: # Only top 3 stories
-                print(f"[{category}] {entry.title}")
+                full_title = entry.get('title', 'No title').strip()
+                full_title = " ".join(full_title.split())
+
+                print(f"[{category}] {full_title}")
 
 #3. Run
     def run(self):
