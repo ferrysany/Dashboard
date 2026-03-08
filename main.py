@@ -3,7 +3,7 @@ import feedparser # For News (RSS)
 import os
 from bs4 import BeautifulSoup
 
-proxy_url = "http://127.0.0.1:7897"
+#proxy_url = "http://127.0.0.1:7897"
 
 #os.environ['HTTP_PROXY'] = proxy_url
 #os.environ['HTTPS_PROXY'] = proxy_url
