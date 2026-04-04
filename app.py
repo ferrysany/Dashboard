@@ -11,7 +11,7 @@ if st.button('🔄 Run My Script'):
     if result.returncode == 0:
         #st.markdown(result.stdout.replace('\n',' \n'))
         # Split the output by lines and display each line separately
-        for line in res.stdout.split('\n'):
+        for line in result.stdout.split('\n'):
             if line.strip():
                 # st.write is natively responsive and adds proper spacing
                 st.write(line.strip())
