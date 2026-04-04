@@ -19,3 +19,4 @@ if st.button('🔄 Run My Script'):
         st.error("❌ Your script crashed. Here is why:")
         st.code(result.stderr)  # This is the "magic" line that shows the bug
 
+
