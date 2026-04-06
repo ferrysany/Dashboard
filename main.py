@@ -76,16 +76,49 @@ class PersonalDashboard:
             url = f"http://www.aastocks.com/en/cnhk/quote/quote.aspx?symbol={symbol.split('.')[0]}"
         else:
             url = f"http://www.aastocks.com/en/usq/quote/quote.aspx?symbol={symbol}"
+        print(f"DEBUG: Fetching {url}")
 
         try:
             resp = session.get(url, timeout=10)
-            soup = BeautifulSoup(resp.content, 'html.parser')
-            price_tag = soup.find(class_="quote_last")
-            change_tag = soup.find(class_="quote_chg_per")
 
-            if price_tag and change_tag:
-                return f"**{symbol}**: {price_tag.text.strip()} ({change_tag.text.strip()}) [AA]"
-            return f"**{symbol}**: Symbol not found on AASTOCKS"
+            html_text = resp.text
+            soup = BeautifulSoup(html_text, 'html.parser')
+
+            price_tag = soup.find("div", class_="quote_last") or soup.find("span", class_=["pos", "neg", "unc"])
+            #change_tag = soup.find(class_="quote_chg_per")
+
+            price = price_tag.get('data-value') if price_tag and price_tag.has_attr('data-value') else None
+
+            if not price and price_tag:
+                price = price_tag.text.strip()
+
+            if not price:
+                import re
+                # This regex looks for a number after the word "last" or "price" in the JS code
+                match = re.search(r'last["\']\s*:\s*["\']([\d\.,]+)["\']', html_text)
+                if match:
+                    price = match.group(1)
+            #if price_tag and change_tag:
+            #    return f"**{symbol}**: {price_tag.text.strip()} ({change_tag.text.strip()}) [AA]"
+            #return f"**{symbol}**: Symbol not found on AASTOCKS"
+
+            #if not price_tag:
+                # Find any tag containing "Closed" and get the next sibling text
+            #    closed_label = soup.find(lambda tag: tag.name == "span" and "Closed" in tag.text)
+            #    if closed_label:
+                    # Often the price is in the parent div or a span next to it
+            #        price_tag = closed_label.find_next(class_="pos") or closed_label.find_next(class_="neg")
+
+            #if price_tag:
+            #    p = price_tag.text.strip()
+                # Clean up the change text if it exists
+                #c = change_tag.text.strip() if change_tag else "0.00%"
+            #    return f"**{symbol}**: {p}) [AA] Price is available"
+
+            if price:
+                return f"**{symbol}**: {price} ) [AA]"
+
+            return f"**{symbol}**: Data Locked (JS Required)"
 
         except Exception as e:
             return f"**{symbol}**: {e}"
