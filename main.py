@@ -86,7 +86,8 @@ class PersonalDashboard:
             if price_tag and change_tag:
                 return f"**{symbol}**: {price_tag.text.strip()} ({change_tag.text.strip()}) [AA]"
             return f"**{symbol}**: Symbol not found on AASTOCKS"
-        except: Exception as e:
+
+        except Exception as e:
             return f"**{symbol}**: {e}"
 
 # 2. GET THE STOCKS PRICE (Markets)
