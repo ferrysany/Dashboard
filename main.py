@@ -1,6 +1,6 @@
 import yfinance as yf # For Stock Data
 import feedparser # For News (RSS)
-import os
+import os, csv
 import platform
 import requests
 from bs4 import BeautifulSoup
@@ -52,24 +52,50 @@ session.trust_env = False
 class PersonalDashboard:
 
     def __init__(self):
-        self.stocks = ["TSLA", "AAPL", "NVDA", "0700.HK", "2800.HK"]  # Add your portfolio here
+        #self.stocks = ["TSLA", "AAPL", "NVDA", "0700.HK", "2800.HK"]  # Add your portfolio here
+        self.stocks = self._load_stocks_from_csv()
         self.news_feeds = {
             "Global Business": "https://search.cnbc.com/rs/search/view.xml?partnerId=2000&keywords=business",
             "HK News (SCMP)": "https://www.scmp.com/rss/2/feed",
             "World": "https://qz.com/feed",
             "Tech": "https://www.theverge.com/rss/index.xml"
         }
+# 1. THE STOCKS
+    def _load_stocks_from_csv(self):
+        if os.path.exists('stocks.csv'):
+            with open('stocks.csv', 'r') as f:
+                reader = csv.reader(f)
+                return [row['symbol'] for row in reader]
+        return ["TSLA", "AAPL", "NVDA", "0700.HK", "2800.HK"]
 
-# 1. THE STOCKS (NBA and Markets)
+# 2. GET STOCKS PRICE FROM AASTOCKS
+    def fetch_aastocks(self, symbol):
+        if ".HK" in symbol:
+            url = f"http://www.aastocks.com/en/mobile/quote.aspx?symbol={symbol.replace('.HK', '').zfill(5)}"
+        elif any(x in symbol for x in [".SS", ".SZ"]):
+            url = f"http://www.aastocks.com/en/cnhk/quote/quote.aspx?symbol={symbol.split('.')[0]}"
+        else:
+            url = f"http://www.aastocks.com/en/usq/quote/quote.aspx?symbol={symbol}"
+        resp = session.get(url, timeout=10)
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        price = soup.find(class_="quote_last").text.strip()
+        change = soup.find(class_="quote_chg_per").text.strip()
+        return f"**{symbol}**: {price} ({change}) [AA]"
+
+# 2. GET THE STOCKS PRICE (Markets)
     def get_market_pulse(self):
         print("--- MARKET UPDATES ---")
 
-        # 1. Fetch ALL tickers at once (One single request instead of five)
+        # 1. Fetch ALL tickers at once (One single request instead of one by one)
         tickers_obj = yf.Tickers(" ".join(self.stocks), session=session)
 
         for ticker in self.stocks:
             try:
-                # 2. Access the data from the pre-fetched object
+                # 2. GET QUOTE FROM AASTOCKS
+                print(self.fetch_aastocks(ticker))
+            except:
+                print(f"**{symbol}**: Fetch Error")
+                # 2. FALL BACK TO YAHOO
                 data = tickers_obj.tickers[ticker]
 
                 # Try to get info safely
@@ -88,10 +114,6 @@ class PersonalDashboard:
 
                 print(f"{company_name} {ticker}: ${current_price:.2f}"
                       f"({sign}{percent_change:.2f}%)")
-
-            except Exception as e:
-                print(f"Could not fetch {ticker}: {e}")
-
 
 # 2. THE NEWS (HK & US)
     def get_news_pulse(self):
