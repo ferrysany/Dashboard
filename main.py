@@ -76,11 +76,18 @@ class PersonalDashboard:
             url = f"http://www.aastocks.com/en/cnhk/quote/quote.aspx?symbol={symbol.split('.')[0]}"
         else:
             url = f"http://www.aastocks.com/en/usq/quote/quote.aspx?symbol={symbol}"
-        resp = session.get(url, timeout=10)
-        soup = BeautifulSoup(resp.content, 'html.parser')
-        price = soup.find(class_="quote_last").text.strip()
-        change = soup.find(class_="quote_chg_per").text.strip()
-        return f"**{symbol}**: {price} ({change}) [AA]"
+
+        try:
+            resp = session.get(url, timeout=10)
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            price_tag = soup.find(class_="quote_last")
+            change_tag = soup.find(class_="quote_chg_per")
+
+            if price_tag and change_tag:
+                return f"**{symbol}**: {price_tag.text.strip()} ({change_tag.text.strip()}) [AA]"
+            return f"**{symbol}**: Symbol not found on AASTOCKS"
+        except: Exception as e:
+            return f"**{symbol}**: {e}"
 
 # 2. GET THE STOCKS PRICE (Markets)
     def get_market_pulse(self):
