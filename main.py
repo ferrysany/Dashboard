@@ -137,17 +137,17 @@ class PersonalDashboard:
             #except:
                 #print(f"**{symbol}**: Fetch Error")
                 # 2. FALL BACK TO YAHOO
-                data = tickers_obj.tickers[ticker].fast_info
+                data = tickers_obj.tickers[ticker]
 
                 # Try to get info safely
                 # NOTE: Use .fast_info for price to avoid heavy API calls
-                current_price = data.last_price
+                current_price = data.fast_info.last_price
 
-                open_price = data.fast_info.open
-                prev_close = data.previous_close
+                #open_price = data.fast_info.open
+                prev_close = data.fast_info.previous_close
 
                 # Calculate the difference
-                change = ((price - prev_close) / prev_close) * 100
+                change = ((current_price - prev_close) / prev_close) * 100
 
                 company_name = data.info.get('shortName', ticker)
 
