@@ -126,47 +126,71 @@ class PersonalDashboard:
 # 2. GET THE STOCKS PRICE (Markets)
     def get_market_pulse(self):
         print("--- MARKET UPDATES (Yahoo) ---")
+        us_data, hk_data, cn_data = [], [], []
 
         #Split the 21 stocks into smaller chunks of 7
-        chunk_size = 7
-        stock_chunks = [self.stocks[i:i + chunk_size] for i in range(0, len(self.stocks), chunk_size)]
+        #chunk_size = 7
+        #stock_chunks = [self.stocks[i:i + chunk_size] for i in range(0, len(self.stocks), chunk_size)]
 
-        for chunk in stock_chunks:
-            try:
-                # 1. Fetch ALL tickers at once (One single request instead of one by one)
-                tickers_obj = yf.Tickers(" ".join(chunk), session=session)
+        #for chunk in stock_chunks:
+        try:
+            # 1. Fetch ALL tickers at once (One single request instead of one by one)
+            tickers_obj = yf.Tickers(" ".join(self.stocks), session=session)
 
-                for ticker in chunk:
+            for ticker in self.stocks:
+                try:
+                    # 2. GET QUOTE FROM AASTOCKS
+                    #print(self.fetch_aastocks(ticker))
+                #except:
+                    #print(f"**{symbol}**: Fetch Error")
+                    # 2. FALL BACK TO YAHOO
+                    data = tickers_obj.tickers[ticker]
+
                     try:
-                        # 2. GET QUOTE FROM AASTOCKS
-                        #print(self.fetch_aastocks(ticker))
-                    #except:
-                        #print(f"**{symbol}**: Fetch Error")
-                        # 2. FALL BACK TO YAHOO
-                        data = tickers_obj.tickers[ticker]
-
-                        # Try to get info safely
-                        # NOTE: Use .fast_info for price to avoid heavy API calls
                         current_price = data.fast_info.last_price
+                        prev_close = data.fast_info.previous_close or data.fast_info.open
+                    except:
+                        hist = data.history(period="1d")
+                        current_price = hist['Close'].iloc[-1]
+                        prev_close = hist['Open'].iloc[-1]
 
-                        #open_price = data.fast_info.open
-                        prev_close = data.fast_info.previous_close
+                    # Get Company Short Name (or ticker if name missing)
+                    full_name = data.info.get('shortName', ticker)
+                    short_name = (full_name[:12] + '..') if len(full_name) > 14 else full_name
 
-                        # Calculate the difference
-                        change = ((current_price - prev_close) / prev_close) * 100
+                    # Calculate the difference
+                    change = ((current_price - prev_close) / prev_close) * 100
+                    # Determine display sign
+                    sign = "+" if change >= 0 else "-"
 
-                        company_name = data.info.get('shortName', ticker)
+                    # Combined format: Name Ticker: Price (Change)
+                    # Example: Tesla TSLA: 175.20 (+1.20%)
+                    display_text = f"{short_name} **{ticker.replace('.HK', '')}**: {current_price:.2f} ({sign}{change:.2f}%)"
 
-                        # Determine display sign
-                        sign = "+" if change >= 0 else ""
+                    if ".HK" in ticker:
+                        hk_data.append((display_text, change))
+                    elif ".SS" in ticker:
+                        cn_data.append((display_text, change))
+                    else:
+                        us_data.append((display_text, change))
+                except Exception:
+                    continue
 
-                        print(f"{company_name} {ticker}: ${current_price:.2f}"
-                                f"({sign}{change:.2f}%)")
-                    except Exception:
-                        print(f"**{ticker}**: Data Error")
+            # Sort by descending % change
+            for d in [us_data, hk_data, cn_data]: d.sort(key=lambda x: x[1], reverse=True)
 
-            except Exception as e:
-                print(f"Connection Error for group {chunk[0]}...: {e}")
+            # Print markers for app.py
+            print("---US---")
+            for item, _ in us_data: print(item)
+
+            print("---HK---")
+            for item, _ in hk_data: print(item)
+
+            print("---CN---")
+            for item, _ in cn_data: print(item)
+
+        except Exception as e:
+            print(f"Connection Error： {e}")
 
 # 2. THE NEWS (HK & US)
     def get_news_pulse(self):
