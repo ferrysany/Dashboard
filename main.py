@@ -62,10 +62,10 @@ class PersonalDashboard:
         }
 # 1. THE STOCKS
     def _load_stocks_from_csv(self):
+        stocks = []
         if os.path.exists('stock.csv'):
             with open('stock.csv', 'r') as f:
-                reader = csv.reader(f)
-                return [row['symbol'] for row in reader]
+                return [line.strip().upper() for line in f if line.strip()]
         return ["TSLA", "AAPL", "NVDA", "0700.HK", "2800.HK"]
 
 # 2. GET STOCKS PRICE FROM AASTOCKS
