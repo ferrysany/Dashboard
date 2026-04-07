@@ -162,9 +162,11 @@ class PersonalDashboard:
 
                         print(f"{company_name} {ticker}: ${current_price:.2f}"
                                 f"({sign}{change:.2f}%)")
+                    except Exception:
+                        print(f"**{ticker}**: Data Error")
 
-                    except Exception as e:
-                        print(f"Connection Error for group {chunk[0]}...: {e}")
+            except Exception as e:
+                print(f"Connection Error for group {chunk[0]}...: {e}")
 
 # 2. THE NEWS (HK & US)
     def get_news_pulse(self):
