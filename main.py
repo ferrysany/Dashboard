@@ -127,38 +127,44 @@ class PersonalDashboard:
     def get_market_pulse(self):
         print("--- MARKET UPDATES (Yahoo) ---")
 
-        # 1. Fetch ALL tickers at once (One single request instead of one by one)
-        tickers_obj = yf.Tickers(" ".join(self.stocks), session=session)
+        #Split the 21 stocks into smaller chunks of 7
+        chunk_size = 7
+        stock_chunks = [self.stocks[i:i + chunk_size] for i in range(0, len(self.stocks), chunk_size)]
 
-        for ticker in self.stocks:
+        for chunk in stock_chunks:
             try:
-                # 2. GET QUOTE FROM AASTOCKS
-                #print(self.fetch_aastocks(ticker))
-            #except:
-                #print(f"**{symbol}**: Fetch Error")
-                # 2. FALL BACK TO YAHOO
-                data = tickers_obj.tickers[ticker]
+                # 1. Fetch ALL tickers at once (One single request instead of one by one)
+                tickers_obj = yf.Tickers(" ".join(chunk), session=session)
 
-                # Try to get info safely
-                # NOTE: Use .fast_info for price to avoid heavy API calls
-                current_price = data.fast_info.last_price
+                for ticker in chunk:
+                    try:
+                        # 2. GET QUOTE FROM AASTOCKS
+                        #print(self.fetch_aastocks(ticker))
+                    #except:
+                        #print(f"**{symbol}**: Fetch Error")
+                        # 2. FALL BACK TO YAHOO
+                        data = tickers_obj.tickers[ticker]
 
-                #open_price = data.fast_info.open
-                prev_close = data.fast_info.previous_close
+                        # Try to get info safely
+                        # NOTE: Use .fast_info for price to avoid heavy API calls
+                        current_price = data.fast_info.last_price
 
-                # Calculate the difference
-                change = ((current_price - prev_close) / prev_close) * 100
+                        #open_price = data.fast_info.open
+                        prev_close = data.fast_info.previous_close
 
-                company_name = data.info.get('shortName', ticker)
+                        # Calculate the difference
+                        change = ((current_price - prev_close) / prev_close) * 100
 
-                # Determine display sign
-                sign = "+" if change >= 0 else ""
+                        company_name = data.info.get('shortName', ticker)
 
-                print(f"{company_name} {ticker}: ${current_price:.2f}"
-                        f"({sign}{change:.2f}%)")
+                        # Determine display sign
+                        sign = "+" if change >= 0 else ""
 
-            except Exception as e:
-                print(f"Market Connection Error: {e}")
+                        print(f"{company_name} {ticker}: ${current_price:.2f}"
+                                f"({sign}{change:.2f}%)")
+
+                    except Exception as e:
+                        print(f"Connection Error for group {chunk[0]}...: {e}")
 
 # 2. THE NEWS (HK & US)
     def get_news_pulse(self):
@@ -175,8 +181,8 @@ class PersonalDashboard:
 
 #3. Run
     def run(self):
-        self.get_market_pulse()
         self.get_news_pulse()
+        self.get_market_pulse()
 
 if __name__ == "__main__":
     dashboard = PersonalDashboard()
