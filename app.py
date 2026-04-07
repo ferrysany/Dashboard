@@ -19,9 +19,17 @@ st.markdown("""
 if os.path.exists("header.jpeg"):
     st.image("header.jpeg", use_container_width=True)
 
+# Get the directory where app.py lives
+current_dir = os.path.dirname(os.path.abspath(__file__))
+main_path = os.path.join(current_dir, 'main.py')
+
 if st.button('🔄 Run My Script'):
     # We use 'capture_output=True' to grab the error message
-    result = subprocess.run([sys.executable, 'main.py'], capture_output=True, text=True)
+    result = subprocess.run([sys.executable, main_path],
+                            capture_output=True,
+                            text=True,
+                            cwd=current_dir
+                            )
 
     if result.returncode == 0:
         #lines = result.stdout.split('\n')
