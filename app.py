@@ -1,6 +1,6 @@
 import streamlit as st
 import subprocess, sys, json
-import panda as pd
+import pandas as pd
 
 st.set_page_config(layout="wide")
 
