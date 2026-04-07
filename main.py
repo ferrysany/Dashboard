@@ -125,7 +125,7 @@ class PersonalDashboard:
 
 # 2. GET THE STOCKS PRICE (Markets)
     def get_market_pulse(self):
-        print("--- MARKET UPDATES ---")
+        print("--- MARKET UPDATES (Yahoo) ---")
 
         # 1. Fetch ALL tickers at once (One single request instead of one by one)
         tickers_obj = yf.Tickers(" ".join(self.stocks), session=session)
@@ -133,28 +133,32 @@ class PersonalDashboard:
         for ticker in self.stocks:
             try:
                 # 2. GET QUOTE FROM AASTOCKS
-                print(self.fetch_aastocks(ticker))
-            except:
-                print(f"**{symbol}**: Fetch Error")
+                #print(self.fetch_aastocks(ticker))
+            #except:
+                #print(f"**{symbol}**: Fetch Error")
                 # 2. FALL BACK TO YAHOO
-                data = tickers_obj.tickers[ticker]
+            data = tickers_obj.tickers[ticker].fast_info
 
                 # Try to get info safely
                 # NOTE: Use .fast_info for price to avoid heavy API calls
-                current_price = data.fast_info.last_price
-                open_price = data.fast_info.open
+            current_price = data.last_price
 
-                # Calculate the difference
-                change_amount = current_price - open_price
-                percent_change = (change_amount/open_price)*100
+            open_price = data.fast_info.open
+            prev_close = data.previous_close
 
-                company_name = data.info.get('shortName', ticker)
+            # Calculate the difference
+            change = ((price - prev_close) / prev_close) * 100
 
-                # Determine display sign
-                sign = "+" if change_amount >= 0 else ""
+            company_name = data.info.get('shortName', ticker)
 
-                print(f"{company_name} {ticker}: ${current_price:.2f}"
-                      f"({sign}{percent_change:.2f}%)")
+            # Determine display sign
+            sign = "+" if change >= 0 else ""
+
+            print(f"{company_name} {ticker}: ${current_price:.2f}"
+                    f"({sign}{percent_change:.2f}%)")
+
+        except Exception as e:
+            print(f"Market Connection Error: {e}")
 
 # 2. THE NEWS (HK & US)
     def get_news_pulse(self):
