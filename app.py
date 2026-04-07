@@ -31,6 +31,7 @@ if st.button('🔄 Run My Script'):
                             cwd=current_dir
                             )
 
+
     if result.returncode == 0:
         #lines = result.stdout.split('\n')
 
