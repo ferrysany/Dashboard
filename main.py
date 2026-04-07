@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from curl_cffi.requests import Session as BrowserSession
 import socket
+import json
 
 def is_proxy_working(host="127.0.0.1", port=7897, timeout=2):
     """Checks if your local VPN port is actually open."""
@@ -179,15 +180,24 @@ class PersonalDashboard:
             # Sort by descending % change
             for d in [us_data, hk_data, cn_data]: d.sort(key=lambda x: x[1], reverse=True)
 
+            output = {
+                "US": [{"Name": x[0], "Price": x[1], "Change": x[2]} for x in us_data],
+                "HK": [{"Name": x[0], "Price": x[1], "Change": x[2]} for x in hk_data],
+                "CN": [{"Name": x[0], "Price": x[1], "Change": x[2]} for x in cn_data]
+            }
+            # Print ONLY the JSON string so app.py can read it
+            print("---DATA_START---")
+            print(json.dumps(output))
+
             # Print markers for app.py
-            print("---US---")
-            for item, _ in us_data: print(item)
-
-            print("---HK---")
-            for item, _ in hk_data: print(item)
-
-            print("---CN---")
-            for item, _ in cn_data: print(item)
+            # print("---US---")
+            # for item, _ in us_data: print(item)
+            #
+            # print("---HK---")
+            # for item, _ in hk_data: print(item)
+            #
+            # print("---CN---")
+            # for item, _ in cn_data: print(item)
 
         except Exception as e:
             print(f"Connection Error： {e}")
