@@ -137,28 +137,28 @@ class PersonalDashboard:
             #except:
                 #print(f"**{symbol}**: Fetch Error")
                 # 2. FALL BACK TO YAHOO
-            data = tickers_obj.tickers[ticker].fast_info
+                data = tickers_obj.tickers[ticker].fast_info
 
                 # Try to get info safely
                 # NOTE: Use .fast_info for price to avoid heavy API calls
-            current_price = data.last_price
+                current_price = data.last_price
 
-            open_price = data.fast_info.open
-            prev_close = data.previous_close
+                open_price = data.fast_info.open
+                prev_close = data.previous_close
 
-            # Calculate the difference
-            change = ((price - prev_close) / prev_close) * 100
+                # Calculate the difference
+                change = ((price - prev_close) / prev_close) * 100
 
-            company_name = data.info.get('shortName', ticker)
+                company_name = data.info.get('shortName', ticker)
 
-            # Determine display sign
-            sign = "+" if change >= 0 else ""
+                # Determine display sign
+                sign = "+" if change >= 0 else ""
 
-            print(f"{company_name} {ticker}: ${current_price:.2f}"
-                    f"({sign}{percent_change:.2f}%)")
+                print(f"{company_name} {ticker}: ${current_price:.2f}"
+                        f"({sign}{percent_change:.2f}%)")
 
-        except Exception as e:
-            print(f"Market Connection Error: {e}")
+            except Exception as e:
+                print(f"Market Connection Error: {e}")
 
 # 2. THE NEWS (HK & US)
     def get_news_pulse(self):
