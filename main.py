@@ -62,8 +62,8 @@ class PersonalDashboard:
         }
 # 1. THE STOCKS
     def _load_stocks_from_csv(self):
-        if os.path.exists('stocks.csv'):
-            with open('stocks.csv', 'r') as f:
+        if os.path.exists('stock.csv'):
+            with open('stock.csv', 'r') as f:
                 reader = csv.reader(f)
                 return [row['symbol'] for row in reader]
         return ["TSLA", "AAPL", "NVDA", "0700.HK", "2800.HK"]
