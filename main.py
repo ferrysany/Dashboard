@@ -155,7 +155,7 @@ class PersonalDashboard:
                 sign = "+" if change >= 0 else ""
 
                 print(f"{company_name} {ticker}: ${current_price:.2f}"
-                        f"({sign}{percent_change:.2f}%)")
+                        f"({sign}{change:.2f}%)")
 
             except Exception as e:
                 print(f"Market Connection Error: {e}")
