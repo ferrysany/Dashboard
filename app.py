@@ -1,5 +1,6 @@
 import streamlit as st
-import subprocess, sys, json, os
+import subprocess, sys, json
+import os
 import pandas as pd
 
 st.set_page_config(layout="wide")
@@ -53,6 +54,8 @@ if st.button('🔄 Run My Script'):
     else:
         st.error("❌ Your script crashed. Here is why:")
         st.code(result.stderr)  # This is the "magic" line that shows the bug
+
+
 
 
 
