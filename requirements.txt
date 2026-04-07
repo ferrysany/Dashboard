@@ -3,4 +3,4 @@ yfinance
 feedparser
 requests
 beautifulsoup4
-
+panda
