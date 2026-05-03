@@ -16,8 +16,8 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Add your key visual/JPEG here
-if os.path.exists("header.jpeg"):
-    st.image("header.jpeg", use_container_width=True)
+#if os.path.exists("header.jpeg"):
+#    st.image("header.jpeg", use_container_width=True)
 
 # Get the directory where app.py lives
 current_dir = os.path.dirname(os.path.abspath(__file__))
