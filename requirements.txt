@@ -4,9 +4,7 @@ feedparser
 requests
 beautifulsoup4
 pandas
-os
 csv
 platform
-Session
 socket
 json
