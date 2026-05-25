@@ -8,13 +8,13 @@ from curl_cffi.requests import Session as BrowserSession
 import socket
 import json
 
-#def is_proxy_working(host="127.0.0.1", port=7897, timeout=2):
-#    """Checks if your local VPN port is actually open."""
-#    try:
-#        with socket.create_connection((host, port), timeout=timeout):
-#            return True
-#    except (OSError, ConnectionRefusedError):
-#        return False
+def is_proxy_working(host="127.0.0.1", port=7897, timeout=2):
+    """Checks if your local VPN port is actually open."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except (OSError, ConnectionRefusedError):
+        return False
 
 
 # --- 1. Environment & Session Setup ---
@@ -145,45 +145,55 @@ class PersonalDashboard:
                 #except:
                     #print(f"**{symbol}**: Fetch Error")
                     # 2. FALL BACK TO YAHOO
-                    data = tickers_obj.tickers[ticker]
+                    #data = tickers_obj.tickers[ticker]
 
-                    try:
-                        current_price = data.fast_info.last_price
-                        prev_close = data.fast_info.previous_close or data.fast_info.open
-                    except:
-                        hist = data.history(period="1d")
-                        current_price = hist['Close'].iloc[-1]
-                        prev_close = hist['Open'].iloc[-1]
+                    #try:
+                    #    current_price = data.fast_info.last_price
+                    #    prev_close = data.fast_info.previous_close or data.fast_info.open
+                    #except:
+                    #     hist = data.history(period="1d")
+                    #     current_price = hist['Close'].iloc[-1]
+                    #     prev_close = hist['Open'].iloc[-1]
+                    #
+                    # # Get Company Short Name (or ticker if name missing)
+                    # full_name = getattr(data.fast_info, 'description', ticker)
+                    # short_name = (full_name[:12] + '..') if len(full_name) > 14 else full_name
+                    #
+                    # # Calculate the difference
+                    # change = ((current_price - prev_close) / prev_close) * 100
+                    # # Determine display sign
+                    # sign = "+" if change >= 0 else "-"
+                    #
+                    # # Combined format: Name Ticker: Price (Change)
+                    # # Example: Tesla TSLA: 175.20 (+1.20%)
+                    # display_text = f"{short_name} **{ticker.replace('.HK', '')}**: {current_price:.2f} ({sign}{change:.2f}%)"
+                    info = tickers_obj.tickers[ticker].fast_info
+                    current_price = info.last_price
+                    prev_close = info.previous_close or info.open
 
-                    # Get Company Short Name (or ticker if name missing)
-                    full_name = data.info.get('shortName', ticker)
-                    short_name = (full_name[:12] + '..') if len(full_name) > 14 else full_name
-
-                    # Calculate the difference
+                    # Use ticker as name — avoids slow data.info call
+                    short_name = ticker.replace('.HK', '').replace('.SS', '').replace('.SZ', '')
                     change = ((current_price - prev_close) / prev_close) * 100
-                    # Determine display sign
-                    sign = "+" if change >= 0 else "-"
 
-                    # Combined format: Name Ticker: Price (Change)
-                    # Example: Tesla TSLA: 175.20 (+1.20%)
-                    display_text = f"{short_name} **{ticker.replace('.HK', '')}**: {current_price:.2f} ({sign}{change:.2f}%)"
+                    entry = (short_name, current_price, change)
+
 
                     if ".HK" in ticker:
-                        hk_data.append((display_text, change))
-                    elif ".SS" in ticker:
-                        cn_data.append((display_text, change))
+                        hk_data.append(entry)
+                    elif ".SS" in ticker or ".SZ" in ticker:
+                        cn_data.append(entry)
                     else:
-                        us_data.append((display_text, change))
+                        us_data.append(entry)
                 except Exception:
                     continue
 
             # Sort by descending % change
-            for d in [us_data, hk_data, cn_data]: d.sort(key=lambda x: x[1], reverse=True)
+            for d in [us_data, hk_data, cn_data]: d.sort(key=lambda x: x[2], reverse=True)
 
             output = {
-                "US": [{"Name": x[0], "Change": x[1]} for x in us_data],
-                "HK": [{"Name": x[0], "Change": x[1]} for x in hk_data],
-                "CN": [{"Name": x[0], "Change": x[1]} for x in cn_data]
+                "US": [{"Name": x[0], "Price": f"{x[1]:.2f}", "Change": x[2]} for x in us_data],
+                "HK": [{"Name": x[0], "Price": f"{x[1]:.2f}", "Change": x[2]} for x in hk_data],
+                "CN": [{"Name": x[0], "Price": f"{x[1]:.2f}", "Change": x[2]} for x in cn_data]
             }
             # Print ONLY the JSON string so app.py can read it
             print("---DATA_START---")
