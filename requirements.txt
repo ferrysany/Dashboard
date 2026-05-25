@@ -4,7 +4,4 @@ feedparser
 requests
 beautifulsoup4
 pandas
-csv
-platform
-socket
-json
+curl_cffi

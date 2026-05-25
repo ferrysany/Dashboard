@@ -8,13 +8,13 @@ from curl_cffi.requests import Session as BrowserSession
 import socket
 import json
 
-def is_proxy_working(host="127.0.0.1", port=7897, timeout=2):
-    """Checks if your local VPN port is actually open."""
-    try:
-        with socket.create_connection((host, port), timeout=timeout):
-            return True
-    except (OSError, ConnectionRefusedError):
-        return False
+#def is_proxy_working(host="127.0.0.1", port=7897, timeout=2):
+#    """Checks if your local VPN port is actually open."""
+#    try:
+#        with socket.create_connection((host, port), timeout=timeout):
+#            return True
+#    except (OSError, ConnectionRefusedError):
+#        return False
 
 
 # --- 1. Environment & Session Setup ---
