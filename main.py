@@ -181,9 +181,9 @@ class PersonalDashboard:
             for d in [us_data, hk_data, cn_data]: d.sort(key=lambda x: x[1], reverse=True)
 
             output = {
-                "US": [{"Name": x[0], "Price": x[1], "Change": x[2]} for x in us_data],
-                "HK": [{"Name": x[0], "Price": x[1], "Change": x[2]} for x in hk_data],
-                "CN": [{"Name": x[0], "Price": x[1], "Change": x[2]} for x in cn_data]
+                "US": [{"Name": x[0], "Change": x[1]} for x in us_data],
+                "HK": [{"Name": x[0], "Change": x[1]} for x in hk_data],
+                "CN": [{"Name": x[0], "Change": x[1]} for x in cn_data]
             }
             # Print ONLY the JSON string so app.py can read it
             print("---DATA_START---")
